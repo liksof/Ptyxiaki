@@ -1,0 +1,182 @@
+old	new	...	...		@@ -0,0 +1,180 @@
+	1	+	SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+	2	+	SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+	3	+	SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
+	4	+	
+	5	+	-- -----------------------------------------------------
+	6	+	-- Schema mydb
+	7	+	-- -----------------------------------------------------
+	8	+	-- -----------------------------------------------------
+	9	+	-- Schema project
+	10	+	-- -----------------------------------------------------
+	11	+	CREATE SCHEMA IF NOT EXISTS `project` ;
+	12	+	USE `project` ;
+	13	+	
+	14	+	-- -----------------------------------------------------
+	15	+	-- Table `project`.`users`
+	16	+	-- -----------------------------------------------------
+	17	+	CREATE TABLE IF NOT EXISTS `project`.`users` (
+	18	+	  `idusers` INT NOT NULL AUTO_INCREMENT,
+	19	+	  `username` VARCHAR(45) NULL,
+	20	+	  `role` VARCHAR(45) NULL,
+	21	+	  PRIMARY KEY (`idusers`))
+	22	+	ENGINE = InnoDB;
+	23	+	
+	24	+	
+	25	+	-- -----------------------------------------------------
+	26	+	-- Table `project`.`login`
+	27	+	-- -----------------------------------------------------
+	28	+	CREATE TABLE IF NOT EXISTS `project`.`login` (
+	29	+	  `iduser` INT NOT NULL,
+	30	+	  `username` VARCHAR(45) NULL,
+	31	+	  `password` VARCHAR(45) NULL,
+	32	+	  PRIMARY KEY (`iduser`),
+	33	+	  CONSTRAINT `uIdFKU`
+	34	+	    FOREIGN KEY (`iduser`)
+	35	+	    REFERENCES `project`.`users` (`idusers`)
+	36	+	    ON DELETE NO ACTION
+	37	+	    ON UPDATE NO ACTION)
+	38	+	ENGINE = InnoDB;
+	39	+	
+	40	+	
+	41	+	-- -----------------------------------------------------
+	42	+	-- Table `project`.`missions`
+	43	+	-- -----------------------------------------------------
+	44	+	CREATE TABLE IF NOT EXISTS `project`.`missions` (
+	45	+	  `idmissions` INT NOT NULL AUTO_INCREMENT,
+	46	+	  `score` INT NULL,
+	47	+	  `start_date` DATETIME NULL,
+	48	+	  `final_date` DATETIME NULL,
+	49	+	  PRIMARY KEY (`idmissions`))
+	50	+	ENGINE = InnoDB;
+	51	+	
+	52	+	
+	53	+	-- -----------------------------------------------------
+	54	+	-- Table `project`.`reports`
+	55	+	-- -----------------------------------------------------
+	56	+	CREATE TABLE IF NOT EXISTS `project`.`reports` (
+	57	+	  `idreports` INT NOT NULL AUTO_INCREMENT,
+	58	+	  `title` VARCHAR(45) NULL,
+	59	+	  `significance` VARCHAR(45) NULL,
+	60	+	  `photo` BLOB NULL,
+	61	+	  `idmissions` INT NULL,
+	62	+	  PRIMARY KEY (`idreports`),
+	63	+	  INDEX `rIdFKM_idx` (`idmissions` ASC),
+	64	+	  CONSTRAINT `rIdFKM`
+	65	+	    FOREIGN KEY (`idmissions`)
+	66	+	    REFERENCES `project`.`missions` (`idmissions`)
+	67	+	    ON DELETE NO ACTION
+	68	+	    ON UPDATE NO ACTION)
+	69	+	ENGINE = InnoDB;
+	70	+	
+	71	+	
+	72	+	-- -----------------------------------------------------
+	73	+	-- Table `project`.`users_has_reports`
+	74	+	-- -----------------------------------------------------
+	75	+	CREATE TABLE IF NOT EXISTS `project`.`users_has_reports` (
+	76	+	  `users_idusers` INT NOT NULL,
+	77	+	  `reports_idreports` INT NOT NULL,
+	78	+	  PRIMARY KEY (`users_idusers`, `reports_idreports`),
+	79	+	  INDEX `fk_users_has_reports_reports1_idx` (`reports_idreports` ASC),
+	80	+	  INDEX `fk_users_has_reports_users1_idx` (`users_idusers` ASC),
+	81	+	  CONSTRAINT `fk_users_has_reports_users1`
+	82	+	    FOREIGN KEY (`users_idusers`)
+	83	+	    REFERENCES `project`.`users` (`idusers`)
+	84	+	    ON DELETE NO ACTION
+	85	+	    ON UPDATE NO ACTION,
+	86	+	  CONSTRAINT `fk_users_has_reports_reports1`
+	87	+	    FOREIGN KEY (`reports_idreports`)
+	88	+	    REFERENCES `project`.`reports` (`idreports`)
+	89	+	    ON DELETE NO ACTION
+	90	+	    ON UPDATE NO ACTION)
+	91	+	ENGINE = InnoDB;
+	92	+	
+	93	+	
+	94	+	-- -----------------------------------------------------
+	95	+	-- Table `project`.`DublicateReports`
+	96	+	-- -----------------------------------------------------
+	97	+	CREATE TABLE IF NOT EXISTS `project`.`DublicateReports` (
+	98	+	  `reportIdSource` INT NOT NULL,
+	99	+	  `reportIdDublicate` INT NOT NULL,
+	100	+	  PRIMARY KEY (`reportIdSource`, `reportIdDublicate`),
+	101	+	  INDEX `rIdDb_idx` (`reportIdDublicate` ASC),
+	102	+	  CONSTRAINT `rIdFKS`
+	103	+	    FOREIGN KEY (`reportIdSource`)
+	104	+	    REFERENCES `project`.`reports` (`idreports`)
+	105	+	    ON DELETE NO ACTION
+	106	+	    ON UPDATE NO ACTION,
+	107	+	  CONSTRAINT `rIdFKDb`
+	108	+	    FOREIGN KEY (`reportIdDublicate`)
+	109	+	    REFERENCES `project`.`reports` (`idreports`)
+	110	+	    ON DELETE NO ACTION
+	111	+	    ON UPDATE NO ACTION)
+	112	+	ENGINE = InnoDB;
+	113	+	
+	114	+	
+	115	+	-- -----------------------------------------------------
+	116	+	-- Table `project`.`categories`
+	117	+	-- -----------------------------------------------------
+	118	+	CREATE TABLE IF NOT EXISTS `project`.`categories` (
+	119	+	  `idCategories` INT NOT NULL AUTO_INCREMENT,
+	120	+	  `title` VARCHAR(45) NULL,
+	121	+	  `idreports` INT NULL,
+	122	+	  PRIMARY KEY (`idCategories`),
+	123	+	  INDEX `rIdFKC_idx` (`idreports` ASC),
+	124	+	  CONSTRAINT `rIdFKC`
+	125	+	    FOREIGN KEY (`idreports`)
+	126	+	    REFERENCES `project`.`reports` (`idreports`)
+	127	+	    ON DELETE NO ACTION
+	128	+	    ON UPDATE NO ACTION)
+	129	+	ENGINE = InnoDB;
+	130	+	
+	131	+	
+	132	+	-- -----------------------------------------------------
+	133	+	-- Table `project`.`DoubleCategory`
+	134	+	-- -----------------------------------------------------
+	135	+	CREATE TABLE IF NOT EXISTS `project`.`DoubleCategory` (
+	136	+	  `categoriesIdFirst` INT NOT NULL,
+	137	+	  `categoriesIdSecond` INT NOT NULL,
+	138	+	  PRIMARY KEY (`categoriesIdFirst`, `categoriesIdSecond`),
+	139	+	  INDEX `rIdFKSc_idx` (`categoriesIdSecond` ASC),
+	140	+	  CONSTRAINT `rIdFKFc`
+	141	+	    FOREIGN KEY (`categoriesIdFirst`)
+	142	+	    REFERENCES `project`.`categories` (`idCategories`)
+	143	+	    ON DELETE NO ACTION
+	144	+	    ON UPDATE NO ACTION,
+	145	+	  CONSTRAINT `rIdFKSc`
+	146	+	    FOREIGN KEY (`categoriesIdSecond`)
+	147	+	    REFERENCES `project`.`categories` (`idCategories`)
+	148	+	    ON DELETE NO ACTION
+	149	+	    ON UPDATE NO ACTION)
+	150	+	ENGINE = InnoDB;
+	151	+	
+	152	+	
+	153	+	-- -----------------------------------------------------
+	154	+	-- Table `project`.`comment`
+	155	+	-- -----------------------------------------------------
+	156	+	CREATE TABLE IF NOT EXISTS `project`.`comment` (
+	157	+	  `idcomment` INT NOT NULL AUTO_INCREMENT,
+	158	+	  `idreports` INT NULL,
+	159	+	  `idusers` INT NULL,
+	160	+	  `text` VARCHAR(45) NULL,
+	161	+	  `solved` TINYINT(1) NULL,
+	162	+	  PRIMARY KEY (`idcomment`),
+	163	+	  INDEX `cIdFKR_idx` (`idreports` ASC),
+	164	+	  INDEX `cIdFKU_idx` (`idusers` ASC),
+	165	+	  CONSTRAINT `cIdFKR`
+	166	+	    FOREIGN KEY (`idreports`)
+	167	+	    REFERENCES `project`.`reports` (`idreports`)
+	168	+	    ON DELETE NO ACTION
+	169	+	    ON UPDATE NO ACTION,
+	170	+	  CONSTRAINT `cIdFKU`
+	171	+	    FOREIGN KEY (`idusers`)
+	172	+	    REFERENCES `project`.`users` (`idusers`)
+	173	+	    ON DELETE NO ACTION
+	174	+	    ON UPDATE NO ACTION)
+	175	+	ENGINE = InnoDB;
+	176	+	
+	177	+	
+	178	+	SET SQL_MODE=@OLD_SQL_MODE;
+	179	+	SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+	180	+	SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+1	181	 	
